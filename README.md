@@ -8,7 +8,7 @@ The repo contains the following directories:
 
 - `utils`: contains auxiliary code for training and testing.
 
-- `utils_anlysis`: contains auxiliary code for data and result analysis.
+- `utils_analysis`: contains auxiliary code for data and result analysis.
 
 
 ### Training models
