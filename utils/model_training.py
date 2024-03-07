@@ -1155,28 +1155,64 @@ class import_and_train_model:
         Ensemble_prob = []
         im_names = data_loader.Filenames
 
-        for i in range(len(test_main.params.model_path)):
-            checkpoint_path = test_main.params.model_path[i]
-            PATH = checkpoint_path + '/trained_model_' + name + '.pth'
-            if torch.cuda.is_available() and test_main.params.use_gpu == 'yes':
-                checkpoint = torch.load(PATH, map_location="cuda:" + str(test_main.params.gpu_id))
-            else:
-                checkpoint = torch.load(PATH, map_location='cpu')
+        if test_main.params.TTA == 'no':
+            for i in range(len(test_main.params.model_path)):
+                checkpoint_path = test_main.params.model_path[i]
+                PATH = checkpoint_path + '/trained_model_' + name + '.pth'
+                if torch.cuda.is_available() and test_main.params.use_gpu == 'yes':
+                    checkpoint = torch.load(PATH, map_location="cuda:" + str(test_main.params.gpu_id))
+                else:
+                    checkpoint = torch.load(PATH, map_location='cpu')
 
-            self.model.load_state_dict(checkpoint['model_state_dict'])
-            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+                self.model.load_state_dict(checkpoint['model_state_dict'])
+                self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
-            # device = torch.device("cpu")
-            # self.model = self.model.module.to(device)
+                # device = torch.device("cpu")
+                # self.model = self.model.module.to(device)
 
-            output, prob = cls_predict_on_unseen(train_main, test_main, data_loader.test_dataloader, self.model)
+                output, prob = cls_predict_on_unseen(train_main, test_main, data_loader.test_dataloader, self.model)
 
-            prob = torch.cat(prob)
+                prob = torch.cat(prob)
 
-            prob = prob.cpu().numpy()
+                prob = prob.cpu().numpy()
 
-            Ensemble_prob.append(prob)
+                Ensemble_prob.append(prob)
 
+        if test_main.params.TTA == 'yes':
+            for i in range(len(test_main.params.model_path)):
+                checkpoint_path = test_main.params.model_path[i]
+                PATH = checkpoint_path + '/trained_model_' + name + '.pth'
+                if torch.cuda.is_available() and test_main.params.use_gpu == 'yes':
+                    checkpoint = torch.load(PATH, map_location="cuda:" + str(test_main.params.gpu_id))
+                else:
+                    checkpoint = torch.load(PATH, map_location='cpu')
+
+                self.model.load_state_dict(checkpoint['model_state_dict'])
+                self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
+                # device = torch.device("cpu")
+                # self.model = self.model.module.to(device)
+
+                output, prob = cls_predict_on_unseen(train_main, test_main, data_loader.test_dataloader, self.model)
+                output_1, prob_1 = cls_predict_on_unseen(train_main, test_main, data_loader.test_dataloader_1, self.model)
+                output_2, prob_2 = cls_predict_on_unseen(train_main, test_main, data_loader.test_dataloader_2, self.model)
+                output_3, prob_3 = cls_predict_on_unseen(train_main, test_main, data_loader.test_dataloader_3, self.model)
+
+                prob = torch.cat(prob)
+                prob_1 = torch.cat(prob_1)
+                prob_2 = torch.cat(prob_2)
+                prob_3 = torch.cat(prob_3)
+
+                prob = prob.cpu().numpy()
+                prob_1 = prob_1.cpu().numpy()
+                prob_2 = prob_2.cpu().numpy()
+                prob_3 = prob_3.cpu().numpy()
+
+                Ensemble_prob.append(prob)
+                Ensemble_prob.append(prob_1)
+                Ensemble_prob.append(prob_2)
+                Ensemble_prob.append(prob_3)
+    
         Ens_DEIT_prob_max = []
         Ens_DEIT_label = []
         Ens_DEIT = []

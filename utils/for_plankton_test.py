@@ -105,12 +105,22 @@ class CreateDataForPlankton:
 
         return
 
-    def create_data_loaders(self, train_main):
+    def create_data_loaders(self, test_main):
         # self.checkpoint_path = test_main.params.model_path
 
-        test_dataset = CreateDataset(X=self.X_train)
+        test_dataset = CreateDataset(X=self.X_train, TTA_type=0)
         self.test_dataloader = DataLoader(test_dataset, 32, shuffle=False, num_workers=4,
                                           pin_memory=True)
+        if test_main.params.TTA == 'yes':
+            test_dataset_1 = CreateDataset(X=self.X_train, TTA_type=1)
+            self.test_dataloader_1 = DataLoader(test_dataset_1, 32, shuffle=False, num_workers=4,
+                                            pin_memory=True)
+            test_dataset_2 = CreateDataset(X=self.X_train, TTA_type=2)
+            self.test_dataloader_2 = DataLoader(test_dataset_2, 32, shuffle=False, num_workers=4,
+                                            pin_memory=True)
+            test_dataset_3 = CreateDataset(X=self.X_train, TTA_type=3)
+            self.test_dataloader_3 = DataLoader(test_dataset_3, 32, shuffle=False, num_workers=4,
+                                            pin_memory=True)
 
     def create_data_loaders_with_y(self, test_main):
         # self.checkpoint_path = test_main.params.model_path
@@ -127,9 +137,10 @@ class CreateDataForPlankton:
 class CreateDataset(Dataset):
     """Characterizes a dataset for PyTorch"""
 
-    def __init__(self, X):
+    def __init__(self, X, TTA_type):
         """Initialization"""
         self.X = X
+        self.TTA_type = TTA_type
 
     def __len__(self):
         """Denotes the total number of samples"""
@@ -139,7 +150,15 @@ class CreateDataset(Dataset):
         """Generates one sample of data"""
         # Select sample
         image = self.X[index]
-        X = self.transform(image)
+        TTA_type = self.TTA_type
+        if TTA_type == 0:
+            X = self.transform(image)
+        elif TTA_type == 1:
+            X = self.transform_TTA_1(image)
+        elif TTA_type == 2:
+            X = self.transform_TTA_2(image)
+        elif TTA_type == 3:
+            X = self.transform_TTA_3(image)
         sample = X
         return sample
 
@@ -148,6 +167,27 @@ class CreateDataset(Dataset):
         T.Resize(224),
         T.ToTensor()])
     transform_y = T.Compose([T.ToTensor()])
+
+    transform_TTA_1 = T.Compose([
+        T.ToPILImage(),
+        T.Resize(224),
+        T.RandomRotation(degrees=(90, 90)),
+        T.ToTensor()])
+    transform_TTA_1_y = T.Compose([T.ToTensor()])
+
+    transform_TTA_2 = T.Compose([
+        T.ToPILImage(),
+        T.Resize(224),
+        T.RandomRotation(degrees=(180, 180)),
+        T.ToTensor()])
+    transform_TTA_2_y = T.Compose([T.ToTensor()])
+
+    transform_TTA_3 = T.Compose([
+        T.ToPILImage(),
+        T.Resize(224),
+        T.RandomRotation(degrees=(270, 270)),
+        T.ToTensor()])
+    transform_TTA_3_y = T.Compose([T.ToTensor()])
 
 
 class CreateDataset_with_y(Dataset):
