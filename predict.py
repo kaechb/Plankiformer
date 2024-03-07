@@ -74,6 +74,8 @@ class LoadInputParameters:
         parser.add_argument('-predict', type=int, default=1, help='Choose "0" for training and "1" for predicting')
         parser.add_argument('-use_gpu', choices=['yes', 'no'], default='no', help='Choose "no" to run using cpu')
         parser.add_argument('-gpu_id', type=int, default=0, help="select the gpu id ")
+        parser.add_argument('-TTA', choices=['yes', 'no'], default='no',
+                            help='Use test-time augmention or not')
 
         args = parser.parse_args(string)
 
@@ -110,7 +112,7 @@ if __name__ == '__main__':
     # For Plankton testing
     for_plankton_test = fplankton_test.CreateDataForPlankton()
     for_plankton_test.make_train_test_for_model(train_params, test_params, prep_test_data)
-    for_plankton_test.create_data_loaders(train_params)
+    for_plankton_test.create_data_loaders(test_params)
 
     # initialize model training
     model_training = mt.import_and_train_model()

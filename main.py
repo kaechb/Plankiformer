@@ -165,6 +165,8 @@ class LoadInputParameters:
         parser.add_argument('-threshold', type=float, default=0.0, help="Threshold to set")
         parser.add_argument('-TTA_type', type=int, default=0,
                             help='Choose the version of test-time augmention')
+        parser.add_argument('-TTA', choices=['yes', 'no'], default='no',
+                            help='Use test-time augmention or not')
 
         # Related to ensembling
         parser.add_argument('-ensemble', type=int, default=0,
