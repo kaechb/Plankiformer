@@ -112,7 +112,6 @@ if __name__ == '__main__':
     logging.info('data loaded')
     prep_test_data.CreateTrainTestSets(train_params, test_params)
     logging.info('passed test data')
-    For Plankton testing
     for_plankton_test = fplankton_test.CreateDataForPlankton()
     logging.info('passed CreateDataForPlankton')
     for_plankton_test.make_train_test_for_model(train_params, test_params, prep_test_data)
