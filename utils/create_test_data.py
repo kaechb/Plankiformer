@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 import pandas as pd
 from PIL import Image
-
+import logging
 
 
 def compute_extrafeat_function(df):
@@ -112,8 +112,8 @@ def ResizeWithProportions(im, desired_size):
     # If the image dimensions are very different, reducing the larger one to `desired_size` can make the other
     # dimension too small. We impose that it be at least 4 pixels.
     if desired_size * smallest_dim / largest_dim < 4:
-        print('Image size: ({},{})'.format(largest_dim, smallest_dim))
-        print('Desired size: ({},{})'.format(desired_size, desired_size))
+        logging.info('Image size: ({},{})'.format(largest_dim, smallest_dim))
+        logging.info('Desired size: ({},{})'.format(desired_size, desired_size))
         raise ValueError(
             'Images are too extreme rectangles to be reduced to this size. Try increasing the desired image size.')
 
@@ -125,7 +125,7 @@ def ResizeWithProportions(im, desired_size):
     if max(im.size) > desired_size:
         ratio = float(desired_size) / max(old_size)
         new_size = tuple([int(x * ratio) for x in old_size])
-        # print('new_size:',new_size)
+        # logging.info('new_size:',new_size)
         sys.stdout.flush()
         im = im.resize(new_size, Image.LANCZOS)
         rescaled = 1
@@ -139,21 +139,21 @@ def ResizeWithProportions(im, desired_size):
 
 
 def ReduceClasses(datapaths, class_select, classifier):
-    print('datapaths:', datapaths)
+    logging.info('datapaths:', datapaths)
     # allClasses = [ name for name in os.listdir(datapaths) if os.path.isdir(os.path.join(datapaths, name)) ]
-    print('datapaths:{}'.format(datapaths))
+    logging.info('datapaths:{}'.format(datapaths))
     allClasses = list(set([name for idata in range(len(datapaths)) for name in os.listdir(datapaths[idata]) if
                            os.path.isdir(os.path.join(datapaths[idata], name))]))
-    print('classes from datapaths:', allClasses)
+    logging.info('classes from datapaths:', allClasses)
 
     if classifier == 'multi':
         if class_select is None:
             class_select = allClasses
         else:
             if not set(class_select).issubset(allClasses):
-                print('Some of the classes input by the user are not present in the dataset.')
-                print('class_select:', class_select)
-                print('all  classes:', allClasses)
+                logging.info('Some of the classes input by the user are not present in the dataset.')
+                logging.info('class_select:', class_select)
+                logging.info('all  classes:', allClasses)
                 raise ValueError
         return class_select
     elif classifier == 'binary':
@@ -277,7 +277,7 @@ def LoadImages(datapaths, L, resize_images=None, training_data=True):
 
     # Create an empty dataframe for this class
     dfClass = pd.DataFrame(columns=['filename', 'npimage'])
-    print('test: ({})'.format(len(classImages)))
+    logging.info('test: ({})'.format(len(classImages)))
     for i, imageName in enumerate(classImages):
         npimage, rescaled, filename = LoadImage(imageName, L, resize_images)
         dfClass.loc[i] = [filename, npimage]
@@ -313,8 +313,8 @@ def LoadMixedData(test_features, L, resize_images, alsoImages, compute_extrafeat
 
     testimages1 = dfFeat['filename']
     testimages = list(testimages1)
-    print('There are {} images in total'.format(len(testimages)))
-    print('There are {} feature files in total'.format(len(test_features)))
+    logging.info('There are {} images in total'.format(len(testimages)))
+    logging.info('There are {} feature files in total'.format(len(test_features)))
 
     df = pd.DataFrame()
     for index, row in dfFeat.iterrows():
@@ -346,7 +346,7 @@ class Cdata:
         self.Ximage = None
         self.datapath = datapath
         if L is None and kind != 'feat':
-            print('CData: image size needs to be set, unless kind is \'feat\'')
+            logging.info('CData: image size needs to be set, unless kind is \'feat\'')
             raise ValueError
         self.L = L
         self.class_select = class_select
@@ -358,6 +358,9 @@ class Cdata:
         self.df = None
         self.y = None
         self.X = None
+        logging.info("datapath:{}".format(self.datapath))
+        logging.info("L:{}".format(self.L))
+        logging.info("class_select: {}".format(self.class_select))
         self.Load(self.datapath, self.L, self.class_select, self.classifier, self.compute_extrafeat, self.resize_images,
                   self.balance_weight, self.kind, training_data=training_data)
         return
@@ -397,7 +400,7 @@ class Cdata:
         else:
             raise NotImplementedError('Only mixed, image or feat data-loading')
 
-        # 		print(self.df['classname'].unique())
+        # 		logging.info(self.df['classname'].unique())
 
         self.kind = kind  # Now the data kind is kind. In most cases, we had already kind=self.kind, but if the user tested another kind, it must be changed
         self.Check()  # Some sanity checks on the dataset
@@ -414,19 +417,19 @@ class Cdata:
         ucols = self.df.drop(columns=['classname', 'url', 'filename', 'file_size', 'timestamp'],
                              errors='ignore').columns
         if len(ucols) < 1:
-            print('Columns: {}'.format(self.df.columns))
+            logging.info('Columns: {}'.format(self.df.columns))
             raise ValueError('The dataset has no useful columns.')
 
         # Check for NaNs
         if self.df.isnull().any().any():
-            print('There are NaN values in the data.')
-            print(self.df)
+            logging.info('There are NaN values in the data.')
+            logging.info(self.df)
             raise ValueError
 
         # Check that the images have the expected size
         if 'npimage' in self.df.columns:
             if self.df.npimage[0].shape != (self.L, self.L, 3):
-                print(
+                logging.info(
                     'Cdata Check(): Images were not reshaped correctly: {} instead of {}'.format(self.npimage[0].shape,
                                                                                                  (self.L, self.L, 3)))
         return
@@ -491,7 +494,7 @@ class CTrainTestSet:
 
     def __init__(self, X, y, filenames, ttkind='image', classifier=None, balance_weight=None, rescale=False,
                  testSplit=0.2,
-                #  testSplit=0.15, 
+                #  testSplit=0.15,
                  valid_set=None, test_set=None, compute_extrafeat=None, random_state=12345):
         """
         X and y are dataframes with features and labels
@@ -644,7 +647,7 @@ class CTrainTestSet:
         """
 
         if self.trainX is None:
-            print(
+            logging.info(
                 'No rescaling is performed because the training set is empty, but the truth is that '
                 'in this case we should have rescaling parameters coming from elsewhere')
             return
@@ -707,8 +710,8 @@ class CTrainTestSet:
             if set(cols).issubset(set(X.columns)):  # Check that columns we want to select exist
                 return X[cols]
             else:
-                print('self.X.columns: {}'.format(self.X.columns))
-                print('requested cols: {}'.format(cols))
+                logging.info('self.X.columns: {}'.format(self.X.columns))
+                logging.info('requested cols: {}'.format(cols))
                 raise IndexError('You are trying to select columns that are not present in the dataframe')
         else:
             assert (len(cols) == 1)  # If it's a series there should be only one column

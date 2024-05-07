@@ -9,15 +9,15 @@ import sys
 
 import numpy as np
 
-from utils import for_birds as birds
-from utils import for_cifar10 as cifar10
-from utils import for_dogs as dogs
+#from utils import for_birds as birds
+#from utils import for_cifar10 as cifar10
+#from utils import for_dogs as dogs
 from utils import for_plankton as fplankton
-from utils import for_wildtrap as wildtrap
+#from utils import for_wildtrap as wildtrap
 from utils import model_training as mt
 from utils import prepare_train_test_data as pdata
-from utils import for_inaturalist as inature
-from utils import for_cifar100 as cifar100
+#from utils import for_inaturalist as inature
+#from utils import for_cifar100 as cifar100
 
 
 def ArgsCheck(args):

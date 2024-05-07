@@ -13,9 +13,9 @@ import main as main_train
 from utils import for_plankton_test as fplankton_test
 from utils import model_training as mt
 from utils import prepare_data_for_testing as pdata_test
-
+import logging
 time_begin = time()
-
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class LoadInputParameters:
     def __init__(self, initMode='default', verbose=True):
@@ -44,7 +44,7 @@ class LoadInputParameters:
         elif mode == 'args':
             self.ReadArgs(string=sys.argv[1:])
         else:
-            print('Unknown parameter mode', mode)
+            logging.info('Unknown parameter mode', mode)
             raise NotImplementedError
         return
 
@@ -96,28 +96,34 @@ if __name__ == '__main__':
 
     # Loading Testing Input parameters
     test_params = LoadInputParameters(initMode='args')
-    print('main_param_path: {}'.format(test_params.params.main_param_path))
+    logging.info('main_param_path: {}'.format(test_params.params.main_param_path))
     test_params.CreateOutDir()
-    print('Loaded testing input parameters')
+    logging.info('Loaded testing input parameters')
 
     # Loading Trained Input parameters
     train_params = main_train.LoadInputParameters(initMode='args')
     train_params.params = np.load(test_params.params.main_param_path + '/params.npy', allow_pickle=True).item()
-    # print(train_params.params)
-    print('Creating test data')
+    # logging.info(train_params.params)
+    logging.info('Creating test data')
     prep_test_data = pdata_test.CreateDataset()
+    logging.info('Creating test object okay')
+
     prep_test_data.LoadData(train_params, test_params)
+    logging.info('data loaded')
     prep_test_data.CreateTrainTestSets(train_params, test_params)
-
-    # For Plankton testing
+    logging.info('passed test data')
+    For Plankton testing
     for_plankton_test = fplankton_test.CreateDataForPlankton()
+    logging.info('passed CreateDataForPlankton')
     for_plankton_test.make_train_test_for_model(train_params, test_params, prep_test_data)
+    logging.info('passed make_train_test_for_model')
     for_plankton_test.create_data_loaders(test_params)
-
+    logging.info('init model')
     # initialize model training
     model_training = mt.import_and_train_model()
+    logging.info('done with model')
     # Do Predictions
     model_training.load_model_and_run_prediction(train_params, test_params, for_plankton_test)
 
     total_secs = -1 if time_begin is None else (time() - time_begin)
-    print('Time taken for prediction (in secs): {}'.format(total_secs))
+    logging.info('Time taken for prediction (in secs): {}'.format(total_secs))

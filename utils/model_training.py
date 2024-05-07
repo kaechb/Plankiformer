@@ -134,7 +134,7 @@ class import_and_train_model:
                     param.requires_grad = False
 
                 for i, param in enumerate(self.model.parameters()):
-                    if i + 1 > n_layer - 5: 
+                    if i + 1 > n_layer - 5:
                         param.requires_grad = True
 
             else:
@@ -149,7 +149,7 @@ class import_and_train_model:
                     param.requires_grad = False
 
                 for i, param in enumerate(self.model.parameters()):
-                    if i + 1 > n_layer - 2: 
+                    if i + 1 > n_layer - 2:
                         param.requires_grad = True
 
             else:
@@ -185,45 +185,45 @@ class import_and_train_model:
         self.lr_scheduler = LRScheduler(self.optimizer)
         self.early_stopping = EarlyStopping()
 
-    def import_deit_models_for_testing(self, train_main, test_main):
+    def import_deit_models_for_testing(self, train_main, test_main,testing=False):
         classes = np.load(test_main.params.main_param_path + '/classes.npy')
         num_classes=len(np.unique(classes))
 
         if train_main.params.architecture == 'deit':
-            self.model = timm.create_model('deit_base_distilled_patch16_224.fb_in1k', pretrained=True,
+            self.model = timm.create_model('deit_base_distilled_patch16_224.fb_in1k', pretrained=not testing,
                                            num_classes=num_classes)
         elif train_main.params.architecture == 'efficientnetb2':
-            self.model = timm.create_model('tf_efficientnet_b2.ns_jft_in1k', pretrained=True,
+            self.model = timm.create_model('tf_efficientnet_b2.ns_jft_in1k', pretrained=not testing,
                                            num_classes=num_classes)
         elif train_main.params.architecture == 'efficientnetb5':
-            self.model = timm.create_model('tf_efficientnet_b5.ns_jft_in1k', pretrained=True,
+            self.model = timm.create_model('tf_efficientnet_b5.ns_jft_in1k', pretrained=not testing,
                                            num_classes=num_classes)
         elif train_main.params.architecture == 'efficientnetb6':
-            self.model = timm.create_model('tf_efficientnet_b6.ns_jft_in1k', pretrained=True,
+            self.model = timm.create_model('tf_efficientnet_b6.ns_jft_in1k', pretrained=not testing,
                                            num_classes=num_classes)
         elif train_main.params.architecture == 'efficientnetb7':
-            self.model = timm.create_model('tf_efficientnet_b7.ns_jft_in1k', pretrained=True,
+            self.model = timm.create_model('tf_efficientnet_b7.ns_jft_in1k', pretrained=not testing,
                                            num_classes=num_classes)
         elif train_main.params.architecture == 'densenet':
-            self.model = timm.create_model('densenet161.tv_in1k', pretrained=True,
+            self.model = timm.create_model('densenet161.tv_in1k', pretrained=not testing,
                                            num_classes=num_classes)
         elif train_main.params.architecture == 'mobilenet':
-            self.model = timm.create_model('mobilenetv3_large_100.miil_in21k_ft_in1k', pretrained=True,
+            self.model = timm.create_model('mobilenetv3_large_100.miil_in21k_ft_in1k', pretrained=not testing,
                                            num_classes=num_classes)
         elif train_main.params.architecture == 'inception':
-            self.model = timm.create_model('inception_v4.tf_in1k', pretrained=True,
+            self.model = timm.create_model('inception_v4.tf_in1k', pretrained=not testing,
                                            num_classes=num_classes)
         elif train_main.params.architecture == 'vit':
-            self.model = timm.create_model('vit_base_patch16_224.augreg2_in21k_ft_in1k', pretrained=True,
+            self.model = timm.create_model('vit_base_patch16_224.augreg2_in21k_ft_in1k', pretrained=not testing,
                                            num_classes=num_classes)
         elif train_main.params.architecture == 'mae':
-            self.model = timm.create_model('vit_base_patch16_224.mae', pretrained=True,
+            self.model = timm.create_model('vit_base_patch16_224.mae', pretrained=not testing,
                                            num_classes=num_classes)
         elif train_main.params.architecture == 'swin':
-            self.model = timm.create_model('swin_base_patch4_window7_224.ms_in22k_ft_in1k', pretrained=True,
+            self.model = timm.create_model('swin_base_patch4_window7_224.ms_in22k_ft_in1k', pretrained=not testing,
                                            num_classes=num_classes)
         elif train_main.params.architecture == 'beit':
-            self.model = timm.create_model('beit_base_patch16_224.in22k_ft_in22k_in1k', pretrained=True,
+            self.model = timm.create_model('beit_base_patch16_224.in22k_ft_in22k_in1k', pretrained=not testing,
                                            num_classes=num_classes)
         else:
             print('This model cannot be imported. Please check from the list of models')
@@ -271,7 +271,7 @@ class import_and_train_model:
                     param.requires_grad = False
 
                 for i, param in enumerate(self.model.parameters()):
-                    if i + 1 > n_layer - 5: 
+                    if i + 1 > n_layer - 5:
                         param.requires_grad = True
 
             else:
@@ -286,7 +286,7 @@ class import_and_train_model:
                     param.requires_grad = False
 
                 for i, param in enumerate(self.model.parameters()):
-                    if i + 1 > n_layer - 2: 
+                    if i + 1 > n_layer - 2:
                         param.requires_grad = True
 
             else:
@@ -486,7 +486,7 @@ class import_and_train_model:
                     np.round(total_mins, 3)))
 
                 if initial_epoch != 0 and epoch == initial_epoch:
-                    train_accuracies = train_a + train_accuracies 
+                    train_accuracies = train_a + train_accuracies
                     test_accuracies = test_a + test_accuracies
                     train_f1s = train_f + train_f1s
                     test_f1s = test_f + test_f1s
@@ -555,8 +555,8 @@ class import_and_train_model:
                 # plt.savefig(data_loader.checkpoint_path + '/updated_performance_curves_rescaled_logx_' + name + '.png')
                 # plt.close()
 
-                dict_curves = {'train_acc': train_accuracies, 'val_acc': test_accuracies, 
-                            'train_f1': train_f1s, 'val_f1': test_f1s, 
+                dict_curves = {'train_acc': train_accuracies, 'val_acc': test_accuracies,
+                            'train_f1': train_f1s, 'val_f1': test_f1s,
                             'train_loss': train_losses, 'val_loss': test_losses}
                 df_curves = pd.DataFrame(data=dict_curves, index=list(range(1, len(train_accuracies) + 1)))
                 df_curves.to_excel(data_loader.checkpoint_path + '/updated_performance_table_' + name + '.xlsx', index=True, header=True)
@@ -676,7 +676,7 @@ class import_and_train_model:
                     np.round(total_mins_per_epoch, 3)))
 
                 if initial_epoch != 0 and epoch == initial_epoch:
-                    train_accuracies = train_a + train_accuracies 
+                    train_accuracies = train_a + train_accuracies
                     train_f1s = train_f + train_f1s
                     train_losses = train_l + train_losses
 
@@ -736,8 +736,8 @@ class import_and_train_model:
                 # plt.savefig(data_loader.checkpoint_path + '/updated_performance_curves_rescaled_logx_' + name + '.png')
                 # plt.close()
 
-                dict_curves = {'train_acc': train_accuracies, 
-                            'train_f1': train_f1s, 
+                dict_curves = {'train_acc': train_accuracies,
+                            'train_f1': train_f1s,
                             'train_loss': train_losses}
                 df_curves = pd.DataFrame(data=dict_curves, index=list(range(1, len(train_accuracies) + 1)))
                 df_curves.to_excel(data_loader.checkpoint_path + '/updated_performance_table_' + name + '.xlsx', index=True, header=True)
@@ -927,7 +927,7 @@ class import_and_train_model:
                     param.requires_grad = False
 
                 for i, param in enumerate(self.model.parameters()):
-                    if i + 1 > n_layer - 5: 
+                    if i + 1 > n_layer - 5:
                         param.requires_grad = True
 
             else:
@@ -953,7 +953,7 @@ class import_and_train_model:
                     param.requires_grad = False
 
                 for i, param in enumerate(self.model.parameters()):
-                    if i + 1 > n_layer - 5: 
+                    if i + 1 > n_layer - 5:
                         param.requires_grad = True
 
             else:
@@ -1212,7 +1212,7 @@ class import_and_train_model:
                 Ensemble_prob.append(prob_1)
                 Ensemble_prob.append(prob_2)
                 Ensemble_prob.append(prob_3)
-    
+
         Ens_DEIT_prob_max = []
         Ens_DEIT_label = []
         Ens_DEIT = []
@@ -1440,7 +1440,7 @@ class import_and_train_model:
             zero_support = list(set(class_output)-set(class_target))
             df_labels_rm_0 = pd.DataFrame(data=[target_label, output_label, prob])
             df_labels_rm_0_t = df_labels_rm_0.transpose()
-            
+
             for i in zero_support:
                 df_labels_rm_0_t = df_labels_rm_0_t[df_labels_rm_0_t.iloc[:, 1] != i]
             df_labels_rm_0 = df_labels_rm_0_t.transpose()
@@ -1456,7 +1456,7 @@ class import_and_train_model:
                     dest_path = test_main.params.test_outpath + '/' + name + '/Classified/' + str(target_label[jj])
                     Path(dest_path).mkdir(parents=True, exist_ok=True)
                     shutil.copy(filenames_out[jj], dest_path)
-            
+
                 else:
                     dest_path = test_main.params.test_outpath + '/' + name + '/Misclassified/' + str(
                         target_label[jj]) + '_as_' + str(output_label[jj])
@@ -1624,7 +1624,7 @@ class import_and_train_model:
                         test_main.params.threshold) + '/Classified/' + str(GT_label[jj])
                     Path(dest_path).mkdir(parents=True, exist_ok=True)
                     shutil.copy(filenames_out[jj], dest_path)
-            
+
                 else:
                     dest_path = test_main.params.test_outpath + '/' + name2 + name + '_thresholded_' + str(
                         test_main.params.threshold) + '/Misclassified/' + str(
@@ -1683,19 +1683,19 @@ class import_and_train_model:
             labels = np.unique(GT_label)
             unknown_index = np.where(labels=='unknown')[0][0]
             labels_rm_unknown = np.delete(labels, unknown_index)
-            
+
             df_labels = pd.DataFrame(data=[GT_label, Ens_DEIT_label, Ens_DEIT])
             df_labels_rm_unknown = df_labels.drop(columns=df_labels.columns[df_labels.iloc[0] == 'unknown'])
 
-            # # for phyto  
+            # # for phyto
             # labels = np.unique(GT_label)
-            # unknown_index = np.where(labels=='unknown')[0][0]            
+            # unknown_index = np.where(labels=='unknown')[0][0]
             # unknown_eccentric_index = np.where(labels=='unknown_eccentric')[0][0]
             # unknown_elongated_index = np.where(labels=='unknown_elongated')[0][0]
             # unknown_probably_dirt_index = np.where(labels=='unknown_probably_dirt')[0][0]
             # unrecognizable_dots_index = np.where(labels=='unrecognizable_dots')[0][0]
             # zooplankton_index = np.where(labels=='zooplankton')[0][0]
-            
+
             # labels_rm_unknown = np.delete(labels, [unknown_index, unknown_eccentric_index, unknown_elongated_index, unknown_probably_dirt_index, unrecognizable_dots_index, zooplankton_index])
 
             # df_labels = pd.DataFrame(data=[GT_label, Ens_DEIT_label])
@@ -1741,7 +1741,7 @@ class import_and_train_model:
                     dest_path = test_main.params.test_outpath + '/' + name2 + name + '/Classified/' + str(GT_label[jj])
                     Path(dest_path).mkdir(parents=True, exist_ok=True)
                     shutil.copy(filenames_out[jj], dest_path)
-            
+
                 else:
                     dest_path = test_main.params.test_outpath + '/' + name2 + name + '/Misclassified/' + str(
                         GT_label[jj]) + '_as_' + str(Ens_DEIT_label[jj])
@@ -1792,7 +1792,7 @@ class import_and_train_model:
 
     def load_model_and_run_prediction(self, train_main, test_main, data_loader):
 
-        self.import_deit_models_for_testing(train_main, test_main)
+        self.import_deit_models_for_testing(train_main, test_main,testing=True)
 
         if test_main.params.finetuned == 0:
             self.initialize_model(train_main, test_main, data_loader, train_main.params.lr)
