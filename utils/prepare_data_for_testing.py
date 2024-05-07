@@ -5,7 +5,7 @@
 import joblib
 
 from utils import create_test_data as cdata_test
-
+import logging
 
 class CreateDataset:
     def __init__(self, initMode='default', verbose=True):
@@ -50,7 +50,17 @@ class CreateDataset:
         balance_weight = train_main.params.balance_weight
         datakind = train_main.params.datakind
         training_data = train_main.params.training_data
-
+        logging.info("testpath:{}".format( testpath))
+        logging.info("L:{}".format( L))
+        logging.info("class_select:{}".format( class_select))
+        logging.info("classifier:{}".format( classifier))
+        logging.info("compute_extrafeat:{}".format(compute_extrafeat)
+        )
+        logging.info("resize_images:{}".format(resize_images))
+        logging.info("balance_weight:{}".format(balance_weight))
+        logging.info("datakind{}".format(datakind))
+        logging.info("training_data{}".format(training_data))
+        logging.info("data:{}".format(self.data))
         # Initialize or Load Data Structure
         if self.data is None:
             self.data = cdata_test.Cdata(testpath, L, class_select, classifier, compute_extrafeat, resize_images,
@@ -166,7 +176,7 @@ class CreateDataset:
                          [], [], [],
                          self.tt.trainXfeat, [], []]
         else:
-            print("Set the right data type")
+            logging.info("Set the right data type")
 
         self.Filenames = [self.tt.trainFilenames]
 
@@ -210,7 +220,7 @@ class CreateDataset:
                          [], [], []]
 
         else:
-            print("Set the right data type")
+            logging.info("Set the right data type")
 
         self.Filenames = [self.tt.trainFilenames]
 
